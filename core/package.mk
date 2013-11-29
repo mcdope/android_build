@@ -259,6 +259,7 @@ ifdef LOCAL_EXPORT_PACKAGE_RESOURCES
 # other packages can use to build their own PRODUCT-agnostic R.java (etc.)
 # files.
 resource_export_package := $(intermediates.COMMON)/package-export.apk
+$(resource_export_package): $(call intermediates-dir-for,APPS,framework-res,,COMMON)/src/R.stamp
 $(R_file_stamp): $(resource_export_package)
 
 # add-assets-to-package looks at PRODUCT_AAPT_CONFIG, but this target
