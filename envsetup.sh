@@ -28,6 +28,8 @@ Invoke ". build/envsetup.sh" from your shell to add the following functions to y
 - repopick: Utility to fetch changes from Gerrit.
 - installboot: Installs a boot.img to the connected device.
 - installrecovery: Installs a recovery.img to the connected device.
+- pushboot:Push a file from your OUT dir to your phone and reboots it, using absolute path.
+- sdkgen:  Generate an android.jar and create a new custom SDK with PAC-ROM APIs
 
 Look at the source to view more functions. The complete list is:
 EOF
@@ -726,6 +728,10 @@ function omnom
 {
     brunch $*
     eat
+}
+
+function sdkgen() {
+        build/tools/customsdkgen.sh
 }
 
 function gettop
