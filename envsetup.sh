@@ -584,6 +584,7 @@ function lunch()
         check_product $product
     else
         #build/tools/roomservice.py $product true
+		echo dummy > /dev/null
     fi
     if [ $? -ne 0 ]
     then
