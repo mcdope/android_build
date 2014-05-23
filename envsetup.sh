@@ -583,7 +583,7 @@ function lunch()
         popd > /dev/null
         check_product $product
     else
-        build/tools/roomservice.py $product true
+        #build/tools/roomservice.py $product true
     fi
     if [ $? -ne 0 ]
     then
