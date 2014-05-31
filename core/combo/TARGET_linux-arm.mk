@@ -1,5 +1,11 @@
+#     _             _     _ ____            _     _
+#    / \   _ __ ___| |__ (_)  _ \ _ __ ___ (_) __| |
+#   / _ \ | '__/ __| '_ \| | | | | '__/ _ \| |/ _` |
+#  / ___ \| | | (__| | | | | |_| | | | (_) | | (_| |
+# /_/   \_\_|  \___|_| |_|_|____/|_|  \___/|_|\__,_|
 #
 # Copyright (C) 2006 The Android Open Source Project
+# Copyright (C) 2014 Łukasz "JustArchi" Domeradzki
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +40,8 @@ ifeq ($(strip $(TARGET_ARCH_VARIANT)),)
 TARGET_ARCH_VARIANT := armv5te
 endif
 
+# This specifies toolchain being used. In case of issues, stick with 4.7
+# 4.8 is default in my optimizations, as it gives noticable performance boost
 ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
 TARGET_GCC_VERSION := 4.8
 else
@@ -81,82 +89,91 @@ TARGET_thumb_CFLAGS :=  -mthumb \
                         -fno-strict-aliasing
 
 else ifeq ($(TARGET_USE_O_LEVEL_3),true)
-TARGET_arm_CFLAGS :=    -O3 \
-                        -DNDEBUG \
-                        -funsafe-loop-optimizations \
-                        -fsection-anchors \
-						-fivopts \
-						-ftree-loop-im \
-						-ftree-loop-ivcanon \
-						-ffunction-sections \
-						-fdata-sections \
-						-funswitch-loops \
-						-frename-registers \
-						-frerun-cse-after-loop \
-						-fomit-frame-pointer \
-						-fgcse-after-reload \
-						-fgcse-sm \
-						-fgcse-las \
-						-fweb \
-						-ftracer \
-						-fstrict-aliasing \
-						-Wstrict-aliasing=3 \
-						-Wno-error=strict-aliasing \
-						-Wno-error=unused-parameter \
-						-Wno-error=unused-but-set-variable \
+TARGET_arm_CFLAGS :=    -O3 \ 
+						-DNDEBUG \ 
+						-fstrict-aliasing \ 
+						-funsafe-loop-optimizations \ 
+						-fsection-anchors \ 
+						-fivopts \ 
+						-ftree-loop-im \ 
+						-ftree-loop-ivcanon \ 
+						-ffunction-sections \ 
+						-fdata-sections \ 
+						-funswitch-loops \ 
+						-frename-registers \ 
+						-fomit-frame-pointer \ 
+						-fgcse-sm \ 
+						-fgcse-las \ 
+						-fweb \ 
+						-ftracer \ 
+						-Wno-error=unused-parameter \ 
+						-Wno-error=unused-but-set-variable \ 
 						-Wno-error=maybe-uninitialized
 
 # Modules can choose to compile some source as thumb.
-TARGET_thumb_CFLAGS :=  -mthumb \
-                        -O3 \
-                        -DNDEBUG \
-                        -funsafe-loop-optimizations \
-                        -fsection-anchors \
-						-fivopts \
-						-ftree-loop-im \
-						-ftree-loop-ivcanon \
-						-ffunction-sections \
-						-fdata-sections \
-						-funswitch-loops \
-						-frename-registers \
-						-frerun-cse-after-loop \
-						-fomit-frame-pointer \
-						-fgcse-after-reload \
-						-fgcse-sm \
-						-fgcse-las \
-						-fweb \
-						-ftracer \
-						-fstrict-aliasing \
-						-Wstrict-aliasing=3 \
-						-Wno-error=strict-aliasing \
-						-Wno-error=unused-parameter \
-						-Wno-error=unused-but-set-variable \
+TARGET_thumb_CFLAGS :=  -mthumb \ 
+						-O3 \ 
+						-DNDEBUG \ 
+						-funsafe-loop-optimizations \ 
+						-fsection-anchors \ 
+						-fivopts \ 
+						-ftree-loop-im \ 
+						-ftree-loop-ivcanon \ 
+						-ffunction-sections \ 
+						-fdata-sections \ 
+						-funswitch-loops \ 
+						-frename-registers \ 
+						-frerun-cse-after-loop \ 
+						-fomit-frame-pointer \ 
+						-fgcse-sm \ 
+						-fgcse-las \ 
+						-fweb \ 
+						-ftracer \ 
+						-Wno-error=unused-parameter \ 
+						-Wno-error=unused-but-set-variable \ 
 						-Wno-error=maybe-uninitialized
 
-TARGET_RELEASE_CFLAGS := -O3 \
-                        -DNDEBUG \
-                        -funsafe-loop-optimizations \
-                        -fsection-anchors \
-						-fivopts \
-						-ftree-loop-im \
-						-ftree-loop-ivcanon \
-						-ffunction-sections \
-						-fdata-sections \
-						-funswitch-loops \
-						-frename-registers \
-						-frerun-cse-after-loop \
-						-fomit-frame-pointer \
-						-fgcse-after-reload \
-						-fgcse-sm \
-						-fgcse-las \
-						-fweb \
-						-ftracer \
-						-fstrict-aliasing \
-						-Wstrict-aliasing=3 \
-						-Wno-error=strict-aliasing \
-						-Wno-error=unused-parameter \
-						-Wno-error=unused-but-set-variable \
-						-Wno-error=maybe-uninitialized
+TARGET_RELEASE_CFLAGS := 	-O3 \ 
+							-DNDEBUG \ 
+							-fno-strict-aliasing \ 
+							-funsafe-loop-optimizations \ 
+							-fsection-anchors \ 
+							-fivopts \ 
+							-ftree-loop-im \ 
+							-ftree-loop-ivcanon \ 
+							-ffunction-sections \ 
+							-fdata-sections \ 
+							-funswitch-loops \ 
+							-frename-registers \ 
+							-fomit-frame-pointer \ 
+							-fgcse-sm \ 
+							-fgcse-las \ 
+							-fweb \ 
+							-ftracer \ 
+							-Wno-error=unused-parameter \ 
+							-Wno-error=unused-but-set-variable \ 
+							-Wno-error=maybe-uninitialized
+
+TARGET_GLOBAL_CPPFLAGS += 	-O3 \ 
+							-DNDEBUG \ 
+							-funsafe-loop-optimizations \ 
+							-fsection-anchors \ 
+							-fivopts \ 
+							-ftree-loop-im \ 
+							-ftree-loop-ivcanon \ 
+							-ffunction-sections \ 
+							-fdata-sections \ 
+							-funswitch-loops \ 
+							-frename-registers \ 
+							-fomit-frame-pointer \ 
+							-fgcse-sm \ 
+							-fgcse-las \ 
+							-fweb \ 
+							-ftracer \ 
+							-Wno-error=unused-parameter \ 
+							-Wno-error=unused-but-set-variable \ 
+							-Wno-error=maybe-uninitialized \ 
+							-Wstrict-aliasing=3
 else
 TARGET_arm_CFLAGS :=    -O2 \
                         -fomit-frame-pointer \
