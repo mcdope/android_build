@@ -1064,7 +1064,7 @@ def main(argv):
                                               "two_step",
                                               "backup=",
                                               "override_device=",
-                                              "override_prop="],
+                                              "override_prop=",
                                               ],
                              extra_option_handler=option_handler)
 
