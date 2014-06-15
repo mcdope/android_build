@@ -192,10 +192,8 @@ endif
 
 ifneq ($(strip $(DISABLE_BUILD_LTO)),)
 # Disable global LTO if DISABLE_BUILD_LTO is set.
-TARGET_LTO_CFLAGS := -flto \
-                     -fno-toplevel-reorder \
-                     -flto-compression-level=5 \
-                     -fuse-linker-plugin
+TARGET_LTO_CFLAGS := -flto -fno-toplevel-reorder -fuse-linker-plugin
+TARGET_LTO_LDFLAGS := -Wl,-flto
 endif
 
 # Define FDO (Feedback Directed Optimization) options.
