@@ -205,9 +205,6 @@ for argument in args.change_number:
     elif 'PA' in gerrit:
         url = 'http://gerrit.paranoidandroid.co/changes/?q=%s&o=CURRENT_REVISION&o=CURRENT_COMMIT&pp=0' % change
         git_remote = 'pa'
-    elif 'LX' in gerrit:
-        url = 'http://legacyxperia.us.to:8080/changes/?q=%s&o=CURRENT_REVISION&o=CURRENT_COMMIT&pp=0' % change
-        git_remote = 'github'
     else:
         git_remote = 'github'
 
@@ -242,10 +239,9 @@ for argument in args.change_number:
     status           = data['status']
     current_revision = data['revisions'][data['current_revision']]
     patch_number     = current_revision['_number']
-    if "PAC" in gerrit:
-        fetch_url    = ('http://review.pac-rom.com/%s' % (project_name_1))
-        short_change = str(change_number)[-2:]
-        fetch_ref    = ('refs/changes/%s/%s/%s' % (short_change, change_number, patch_number))
+    if 'AOSP' in gerrit:
+        fetch_url    = current_revision['fetch']['http']['url']
+        fetch_ref    = current_revision['fetch']['http']['ref']
     else:
         fetch_url    = current_revision['fetch']['anonymous http']['url']
         fetch_ref    = current_revision['fetch']['anonymous http']['ref']
@@ -258,19 +254,11 @@ for argument in args.change_number:
     subject          = current_revision['commit']['subject']
 
     # Truncate project name
-    if 'AOKP' in gerrit:
-        project_name=project_name_1[5:]
-    elif 'AOSP' in gerrit:
+    if 'AOSP' in gerrit or 'PAC' in gerrit:
         project_name=project_name_1
-    elif 'CM' in gerrit:
-        project_name=project_name_1[12:]
-    elif 'github' in gerrit:
-        project_name=project_name_1
-    elif 'PAC' in gerrit:
-        project_name=project_name_1
-    elif 'PA' in gerrit:
-        project_name=project_name_1[16:]
-    elif 'LX' in gerrit:
+    elif 'AOKP' in gerrit or 'CM' in gerrit or 'PA' in gerrit:
+        gerrit_name, project_name = project_name_1.split("/")
+    else:
         project_name=project_name_1
 
     # Check if commit has already been merged and exit if it has, unless -f is specified
