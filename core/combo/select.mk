@@ -94,11 +94,6 @@ ifneq ($(USE_CCACHE),)
     export CCACHE_BASEDIR := $(ANDROID_BUILD_TOP)
   endif
 
-  # It has been shown that ccache 3.x using direct mode can be several times
-  # faster than using the current ccache 2.4 that is used by default
-  # use the system ccache if it exists, else default to the one in prebuilts
-  ccache := $(shell which ccache)
-
   ifeq ($(ccache),)
     CCACHE_HOST_TAG := $(HOST_PREBUILT_TAG)
     # If we are cross-compiling Windows binaries on Linux

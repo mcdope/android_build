@@ -63,6 +63,7 @@ parser.add_argument('-b', '--auto-branch', action='store_true', help='shortcut t
 parser.add_argument('-q', '--quiet', action='store_true', help='print as little as possible')
 parser.add_argument('-v', '--verbose', action='store_true', help='print extra information to aid in debug')
 parser.add_argument('-f', '--force', action='store_true', help='force cherry pick even if commit has been merged')
+parser.add_argument('-p', '--pull', action='store_true', help='execute pull instead of cherry-pick')
 args = parser.parse_args()
 if args.start_branch == None and args.abandon_first:
     parser.error('if --abandon-first is set, you must also give the branch name with --start-branch')
@@ -205,6 +206,9 @@ for argument in args.change_number:
     elif 'PA' in gerrit:
         url = 'http://gerrit.paranoidandroid.co/changes/?q=%s&o=CURRENT_REVISION&o=CURRENT_COMMIT&pp=0' % change
         git_remote = 'pa'
+    elif 'LX' in gerrit:
+        url = 'http://legacyxperia.us.to:8080/changes/?q=%s&o=CURRENT_REVISION&o=CURRENT_COMMIT&pp=0' % change
+        git_remote = 'github'
     else:
         git_remote = 'github'
 
@@ -239,9 +243,10 @@ for argument in args.change_number:
     status           = data['status']
     current_revision = data['revisions'][data['current_revision']]
     patch_number     = current_revision['_number']
-    if 'AOSP' in gerrit:
-        fetch_url    = current_revision['fetch']['http']['url']
-        fetch_ref    = current_revision['fetch']['http']['ref']
+    if "PAC" in gerrit:
+        fetch_url    = ('http://review.pac-rom.com/%s' % (project_name_1))
+        short_change = str(change_number)[-2:]
+        fetch_ref    = ('refs/changes/%s/%s/%s' % (short_change, change_number, patch_number))
     else:
         fetch_url    = current_revision['fetch']['anonymous http']['url']
         fetch_ref    = current_revision['fetch']['anonymous http']['ref']
@@ -254,11 +259,19 @@ for argument in args.change_number:
     subject          = current_revision['commit']['subject']
 
     # Truncate project name
-    if 'AOSP' in gerrit or 'PAC' in gerrit:
+    if 'AOKP' in gerrit:
+        project_name=project_name_1[5:]
+    elif 'AOSP' in gerrit:
         project_name=project_name_1
-    elif 'AOKP' in gerrit or 'CM' in gerrit or 'PA' in gerrit:
-        gerrit_name, project_name = project_name_1.split("/")
-    else:
+    elif 'CM' in gerrit:
+        project_name=project_name_1[12:]
+    elif 'github' in gerrit:
+        project_name=project_name_1
+    elif 'PAC' in gerrit:
+        project_name=project_name_1
+    elif 'PA' in gerrit:
+        project_name=project_name_1[16:]
+    elif 'LX' in gerrit:
         project_name=project_name_1
 
     # Check if commit has already been merged and exit if it has, unless -f is specified
@@ -297,12 +310,27 @@ for argument in args.change_number:
 
     # Fetch project from Gerrit
     if args.verbose:
-      print('Fetching the change from Gerrit')
-    cmd = 'cd %s && git fetch %s %s' % (project_path, fetch_url, fetch_ref)
+       print('Trying to fetch the change from GitHub/Gerrit')
+    if args.pull:
+      cmd = 'cd %s && git pull --no-edit github %s' % (project_path, fetch_ref)
+    else:
+      cmd = 'cd %s && git fetch %s %s' % (project_path, fetch_url, fetch_ref)
     execute_cmd(cmd)
+    # Check if it worked
+    FETCH_HEAD = '%s/.git/FETCH_HEAD' % project_path
+    if os.stat(FETCH_HEAD).st_size == 0:
+        # That didn't work, fetch from Gerrit instead
+        if args.verbose:
+          print('Fetching from GitHub didn\'t work, trying to fetch the change from Gerrit')
+        if args.pull:
+          cmd = 'cd %s && git pull --no-edit %s %s' % (project_path, fetch_url, fetch_ref)
+        else:
+          cmd = 'cd %s && git fetch %s %s' % (project_path, fetch_url, fetch_ref)
+        execute_cmd(cmd)
     # Perform the cherry-pick
     cmd = 'cd %s && git cherry-pick FETCH_HEAD' % (project_path)
-    execute_cmd(cmd)
+    if not args.pull:
+      execute_cmd(cmd)
     if not args.quiet:
         print('')
 
