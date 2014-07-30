@@ -523,35 +523,11 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
   script.ShowProgress(0.5, 0)
 
   if OPTIONS.wipe_user_data:
-    script.Print("Formatting Data")
     script.FormatPartition("/data")
-
-  script.Print("#############################################");
-  script.Print("#                                           #");
-  script.Print("#______   ___   _____ ___  ___  ___   _   _ #");
-  script.Print("#| ___ \ / _ \ /  __ \|  \/  | / _ \ | \ | |#");
-  script.Print("#| |_/ // /_\ \| /  \/| .  . |/ /_\ \|  \| |#");
-  script.Print("#|  __/ |  _  || |    | |\/| ||  _  || . ` |#");
-  script.Print("#| |    | | | || \__/\| |  | || | | || |\  |#");
-  script.Print("#\_|    \_| |_/ \____/\_|  |_/\_| |_/\_| \_/#");
-  script.Print("#       ______  _____ ___  ___ _____        #");
-  script.Print("#       | ___ \|  _  ||  \/  |/  ___|       #");
-  script.Print("#       | |_/ /| | | || .  . |\ `--.        #");
-  script.Print("#       |    / | | | || |\/| | `--. \       #");
-  script.Print("#       | |\ \ \ \_/ /| |  | |/\__/ /       #");
-  script.Print("#       \_| \_| \___/ \_|  |_/\____/        #");
-  script.Print("#                                           #");
-  script.Print("#                                           #");
-  script.Print("#############################################");
-
-  device = GetBuildProp("ro.cm.device", OPTIONS.info_dict)
-  script.Print("Device: %s"%(device));
-  script.Print("#############################################");
 
   if "selinux_fc" in OPTIONS.info_dict:
     WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
 
-  script.Print("Formatting system")
   script.FormatPartition("/system")
   script.Mount("/system")
   if not OPTIONS.no_separate_recovery:
@@ -559,7 +535,6 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
   script.UnpackPackageDir("system", "/system")
 
   symlinks = CopySystemFiles(input_zip, output_zip)
-  script.Print("Making symlinks")
   script.MakeSymlinks(symlinks)
 
   boot_img = common.GetBootableImage("boot.img", "boot.img",
@@ -581,12 +556,9 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
     script.RunBackup("restore")
 
   script.ShowProgress(0.2, 10)
-  script.Print("Flashing boot.img")
   script.WriteRawImage("/boot", "boot.img")
 
   script.ShowProgress(0.1, 0)
-  script.Print("Thanks for choosing PAC-MAN ROMS")
-  script.Print("Enjoy PAC-man now")
   device_specific.FullOTA_InstallEnd()
 
   if OPTIONS.extra_script is not None:
@@ -625,7 +597,7 @@ def WriteMetadata(metadata, output_zip):
 
 def LoadSystemFiles(z):
   """Load all the files from SYSTEM/... in a given target-files
-  zip File, and return a dict of {filename: File object}."""
+  ZipFile, and return a dict of {filename: File object}."""
   out = {}
   for info in z.infolist():
     if info.filename.startswith("SYSTEM/") and not IsSymlink(info):
